@@ -20,8 +20,10 @@ public class HackerBot extends TelegramLongPollingBot {
         this.botToken = botToken;
     }
 
+    @Override
     public String getBotUsername() { return this.botUsername; }
 
+    @Override
     public String getBotToken() { return this.botToken; }
 
     @Override
@@ -34,7 +36,7 @@ public class HackerBot extends TelegramLongPollingBot {
 
         if (messageText.equals("/start")) {
             sendText(chatId, "Соединение установлено. Ты подключился к защищенному шлюзу. Напиши команду <сканировать порты>.");
-            userStates.put(chatId, currentState);
+            userStates.put(chatId, "AWAITING_SCAN");
             return;
         }
 
@@ -42,7 +44,7 @@ public class HackerBot extends TelegramLongPollingBot {
             case "AWAITING_SCAN":
                 if (messageText.equals("сканировать порты")) {
                     sendText(chatId, "🔍 Найдена уязвимость: порт 8080. Напиши: <подключить порт 8080>");
-                    userStates.put(chatId, currentState);
+                    userStates.put(chatId, "AWAITING_CONNECT");
                 } else {
                     sendText(chatId, "❌ Введи команду: <сканировать порты>");
                 }
@@ -50,7 +52,7 @@ public class HackerBot extends TelegramLongPollingBot {
             case "AWAITING_CONNECT":
                 if (messageText.equals("подключить порт 8080")) {
                     sendText(chatId, "🔓 Доступ получен. Выбери действие: <скачать архив* или *майнить крипту>");
-                    userStates.put(chatId, currentState);
+                    userStates.put(chatId, "CHOOSE_TARGET");
                 } else {
                     sendText(chatId, "❌ Введи команду: <подключить порт 8080>");
                 }
@@ -61,7 +63,7 @@ public class HackerBot extends TelegramLongPollingBot {
                     userStates.put(chatId, currentState);
                 } else if (messageText.equals("скачать архив")) {
                     sendText(chatId, "⏳ Скачивание 90%... Тревога! Введи ответ уравнения: <(5 + 5) * 5>");
-                    userStates.put(chatId, currentState);
+                    userStates.put(chatId, "AWAITING_MATH_ANSWER");
                 } else {
                     sendText(chatId, "❌ Выбери: *скачать архив* или *майнить крипту*");
                 }
@@ -72,7 +74,10 @@ public class HackerBot extends TelegramLongPollingBot {
                 } else {
                     sendText(chatId, "❌ Ошибка вычислений! Данные удалены. Напиши `/start` для перезапуска.");
                 }
-                userStates.put(chatId, currentState);
+                userStates.put(chatId, "START");
+                break;
+            default:
+                sendText(chatId, "Напиши `/start`, чтобы начать игру.");
                 break;
         }
     }
