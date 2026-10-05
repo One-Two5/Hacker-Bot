@@ -1,5 +1,6 @@
-package org.example.hakerbot;
+package org.example.hakerbot.config;
 
+import org.example.hakerbot.service.HackerBot;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,9 +18,9 @@ public class BotConfig {
 
 
     @Bean
-    public TelegramBotsApi telegramBotsApi() throws TelegramApiException {
+    public TelegramBotsApi telegramBotsApi(HackerBot hackerBot) throws TelegramApiException {
         TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-        botsApi.registerBot(new HackerBot(botUserName, botToken));
+        botsApi.registerBot(hackerBot);
         return botsApi;
     }
 }
