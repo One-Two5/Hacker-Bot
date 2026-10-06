@@ -1,6 +1,5 @@
 package org.example.hakerbot.repository;
 
-import org.apache.catalina.User;
 import org.example.hakerbot.entity.UserState;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

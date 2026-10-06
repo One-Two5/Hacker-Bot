@@ -32,7 +32,7 @@ public class HackerBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (!update.hasMessage() || !update.getMessage().hasText()) return;
 
-        String messageText = update.getMessage().getText().trim().toLowerCase();
+        String messageText = update.getMessage().getText().trim();
         Long chatId = update.getMessage().getChatId();
         String replyText = hackerService.handleMessage(chatId, messageText);
 
