@@ -8,18 +8,18 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Service
-public class HackerBot extends TelegramLongPollingBot {
+public class TelegramHackerBot extends TelegramLongPollingBot {
 
     private final String botUsername;
     private final String botToken;
-    private final HackerService hackerService;
+    private final GameChangerService gameChangerService;
 
 
-    public HackerBot(@Value("${bot.name}")String botUsername, @Value("${bot.token}")String botToken,
-                     HackerService hackerService) {
+    public TelegramHackerBot(@Value("${bot.name}")String botUsername, @Value("${bot.token}")String botToken,
+                             GameChangerService gameChangerService) {
         this.botUsername = botUsername;
         this.botToken = botToken;
-        this.hackerService = hackerService;
+        this.gameChangerService = gameChangerService;
     }
 
     @Override
@@ -34,7 +34,7 @@ public class HackerBot extends TelegramLongPollingBot {
 
         String messageText = update.getMessage().getText().trim();
         Long chatId = update.getMessage().getChatId();
-        String replyText = hackerService.handleMessage(chatId, messageText);
+        String replyText = gameChangerService.handleMessage(chatId, messageText);
 
         sendText(chatId, replyText);
     }
