@@ -1,9 +1,9 @@
 package org.example.hakerbot.dto;
 
-public class HackerResponse {
+public class GameHttpResponse {
     private String text;
 
-    public HackerResponse(String text) {
+    public GameHttpResponse(String text) {
         this.text = text;
     }
 

@@ -15,7 +15,7 @@ public class UserState {
     private String lastName;
     private String middleName;
     private LocalDate birthDate;
-    private Integer lastBirthdayGreeting;
+    private LocalDate lastBirthdayGreeting;
 
     public UserState() {
     }
@@ -70,11 +70,11 @@ public class UserState {
         this.state = state;
     }
 
-    public Integer getLastBirthdayGreeting() {
+    public LocalDate getLastBirthdayGreeting() {
         return lastBirthdayGreeting;
     }
 
-    public void setLastBirthdayGreeting(Integer lastBirthdayGreeting) {
+    public void setLastBirthdayGreeting(LocalDate lastBirthdayGreeting) {
         this.lastBirthdayGreeting = lastBirthdayGreeting;
     }
 }
