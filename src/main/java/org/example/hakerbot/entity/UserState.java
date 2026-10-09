@@ -10,7 +10,11 @@ public class UserState {
 
     @Id
     private Long userId;
-    private String state;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private State state;
+
     private String firstName;
     private String lastName;
     private String middleName;
@@ -20,7 +24,7 @@ public class UserState {
     public UserState() {
     }
 
-    public UserState(Long userId, String state) {
+    public UserState(Long userId, State state) {
         this.userId = userId;
         this.state = state;
     }
@@ -63,10 +67,10 @@ public class UserState {
     public void setUserId(Long userId) {
         this.userId = userId;
     }
-    public String getState() {
+    public State getState() {
         return state;
     }
-    public void setState(String state) {
+    public void setState(State state) {
         this.state = state;
     }
 

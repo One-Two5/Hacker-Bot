@@ -1,86 +1,80 @@
-package org.example.hakerbot.service;
+package org.example.hakerbot.service.imp;
 
+import org.example.hakerbot.entity.State;
 import org.example.hakerbot.entity.UserState;
-import org.example.hakerbot.repository.UserSessionRepository;
+import org.example.hakerbot.service.GameScript;
 import org.springframework.stereotype.Service;
+
+import static org.example.hakerbot.entity.State.*;
 
 @Service
 public class SpaceSurvivalGameScript implements GameScript {
 
-    private final BirthdayGreetingService birthdayGreetingService;
-    private final UserSessionRepository userRepository;
-
-    public SpaceSurvivalGameScript(BirthdayGreetingService birthdayGreetingService, UserSessionRepository userRepository) {
-        this.birthdayGreetingService = birthdayGreetingService;
-        this.userRepository = userRepository;
+    @Override
+    public boolean supports(State state) {
+        return state != null && state.name().startsWith("SPACE_");
     }
 
     @Override
-    public String handle(Long userId, String messageText) {
-
-        UserState state = userRepository.findById(userId)
-                .orElseGet(() -> userRepository.save(new UserState(userId, "SPACE_START")));
-
-        String birthdayGreeting =  birthdayGreetingService.getGreetingIfBirthday(state);
-
+    public String handle(UserState state, String messageText) {
         switch (state.getState()) {
-            case "SPACE_START":
+            case SPACE_START:
                 if (messageText.equals("старт")) {
-                    state.setState("SPACE_AWAITING_RADAR");
-                    return birthdayGreeting + " Бортовой компьютер активирован. Приветствую, капитан! " +
+                    state.setState(State.SPACE_AWAITING_RADAR);
+                    return " Бортовой компьютер активирован. Приветствую, капитан! " +
                             "Обнаружен сбой в работе навигационного оборудования." +
                             "Главнокомандующий на связи. Введи команду: <включить радар>, чтобы просканировать пространство.";
                 }
-                return birthdayGreeting + " Введи команду: <старт>";
+                return " Введи команду: <старт>";
 
-            case "SPACE_AWAITING_RADAR":
+            case SPACE_AWAITING_RADAR:
                 if (messageText.equals("включить радар")) {
-                    state.setState("SPACE_AWAITING_SHIELD");
-                    return birthdayGreeting + " Сканирование... Обнаружен пояс метеоритов! " +
+                    state.setState(State.SPACE_AWAITING_SHIELD);
+                    return " Сканирование... Обнаружен пояс метеоритов! " +
                             "Прямая угроза обшивке корабля через 3 минуты." +
                             "Защитные поля отключены. Напиши команду: <запустить щит>, чтобы активировать генератор энергии.";
                 }
-                return birthdayGreeting + " Неизвестная команда. Введи: <включить радар>";
+                return " Неизвестная команда. Введи: <включить радар>";
 
-            case "SPACE_AWAITING_SHIELD":
+            case SPACE_AWAITING_SHIELD:
                 if (messageText.equals("запустить щит")) {
-                    state.setState("SPACE_CHOOSE_PATH");
-                    return birthdayGreeting + " Генератор запущен. Компьютер запрашивает, " +
+                    state.setState(State.SPACE_CHOOSE_PATH);
+                    return " Генератор запущен. Компьютер запрашивает, " +
                             "куда направить энергию для обеспечения безопасности." +
                             "Выбери один из вариантов:" +
                             "- <силовой барьер> (оптимальная защита ядра корабля)" +
                             "- <гиперпрыжок> (попытка уйти из опасного сектора)";
                 }
-                return birthdayGreeting + " Корабль в опасности! Напиши: <запустить щит>";
+                return " Корабль в опасности! Напиши: <запустить щит>";
 
-            case "SPACE_CHOOSE_PATH":
+            case SPACE_CHOOSE_PATH:
                 if (messageText.equals("гиперпрыжок")) {
-                    state.setState("START");
-                    return birthdayGreeting + " Ошибка! Энергосеть корабля перегружена из-за неисправных двигателей. " +
+                    state.setState(State.START);
+                    return " Ошибка! Энергосеть корабля перегружена из-за неисправных двигателей. " +
                             "Гипердвигатель взорвался. Корабль уничтожен." +
                             "Напиши `/start`, чтобы вернуться в главное меню.";
                 } else if (messageText.equals("силовой барьер")) {
-                    state.setState("SPACE_AWAITING_CALCULATION");
-                    return birthdayGreeting + " Удар! Силовой барьер сдерживает метеоритный поток. " +
+                    state.setState(State.SPACE_AWAITING_CALCULATION);
+                    return " Удар! Силовой барьер сдерживает метеоритный поток. " +
                             "Чтобы рассчитать безопасную траекторию выхода из пояса, реши уравнение:" +
                             "Введи ответ для компьютера: <(140 / 2) + 5>";
                 }
                 return "Неверный выбор. Напиши: <силовой барьер> или <гиперпрыжок>";
 
-            case "SPACE_AWAITING_CALCULATION":
-                state.setState("START");
+            case SPACE_AWAITING_CALCULATION:
+                state.setState(State.START);
                 if (messageText.equals("75")) {
-                    return birthdayGreeting + " Стабилизация! Траектория посчитана, системы пришли в норму. " +
+                    return " Стабилизация! Траектория посчитана, системы пришли в норму. " +
                             "Космический корабль успешно вышел из зоны метеоритов." +
                             "Капитан, вы спасли экипаж! Миссия выполнена. Напиши `/start` для новой игры.";
                 }
-                return birthdayGreeting + " Неверные расчеты! Вы направили корабль прямо по курсу крупного астероида. " +
+                return " Неверные расчеты! Вы направили корабль прямо по курсу крупного астероида. " +
                         "Реактор разрушен, корабль потерян." +
                         "Миссия провалена. Напиши `/start` для перезапуска.";
 
             default:
-                state.setState("START");
-                return birthdayGreeting +" Ошибка космического симулятора. Напиши `/start` для возврата в меню.";
+                state.setState(State.START);
+                return " Ошибка космического симулятора. Напиши `/start` для возврата в меню.";
         }
     }
 }

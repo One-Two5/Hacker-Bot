@@ -1,7 +1,9 @@
 package org.example.hakerbot.service;
 
-import java.time.LocalDate;
+import org.example.hakerbot.entity.State;
+import org.example.hakerbot.entity.UserState;
 
 public interface GameScript {
-    String handle(Long userId, String messageText);
+    boolean supports(State state);
+    String handle(UserState state, String messageText);
 }
