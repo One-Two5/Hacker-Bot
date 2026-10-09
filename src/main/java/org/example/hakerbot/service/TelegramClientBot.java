@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Service
 public class TelegramClientBot extends TelegramLongPollingBot {
@@ -40,17 +40,17 @@ public class TelegramClientBot extends TelegramLongPollingBot {
         String messageText = update.getMessage().getText().trim();
         Long chatId = update.getMessage().getChatId();
 
-       LocalDate today = LocalDate.now();
+       LocalDateTime today = LocalDateTime.now();
+       boolean isEvenMinute = (today.getMinute() % 2 == 0);
 
        userRepository.findById(chatId).ifPresent(state -> {
            if (state.getBirthDate() != null && !today.equals(state.getLastBirthdayGreeting())) {
-               String birthdayGreeting = birthdayGreetingService.getGreetingIfBirthday(state);
+               String birthdayGreeting = birthdayGreetingService.getGreetingIfBirthday(state, isEvenMinute);
 
                if (birthdayGreeting != null && !birthdayGreeting.isBlank()) {
                    sendResponse(chatId, birthdayGreeting);
 
-                   state.setLastBirthdayGreeting(today);
-                   userRepository.save(state);
+                   userRepository.saveAndFlush(state);
                }
            }
        });
