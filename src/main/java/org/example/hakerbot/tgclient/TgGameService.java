@@ -7,7 +7,6 @@ import org.example.hakerbot.entity.UserState;
 import org.example.hakerbot.repository.UserSessionRepository;
 import org.example.hakerbot.service.BirthdayGreetingService;
 import org.example.hakerbot.service.imp.GameChangerService;
-import org.example.hakerbot.service.imp.RegistrationScript;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,14 +17,12 @@ public class TgGameService {
     private final UserSessionRepository userRepository;
     private final GameChangerService gameChangerService;
     private final BirthdayGreetingService birthdayGreetingService;
-    private final RegistrationScript registrationScript;
 
     public TgGameService(UserSessionRepository userRepository,
-                         GameChangerService gameChangerService, BirthdayGreetingService birthdayGreetingService, RegistrationScript registrationScript) {
+                         GameChangerService gameChangerService, BirthdayGreetingService birthdayGreetingService) {
         this.userRepository = userRepository;
         this.gameChangerService = gameChangerService;
         this.birthdayGreetingService = birthdayGreetingService;
-        this.registrationScript = registrationScript;
     }
 
     @Transactional
@@ -35,17 +32,15 @@ public class TgGameService {
 
         boolean wasAlreadyRegistered = state.getBirthDate() != null;
 
-        String gameResponse = gameChangerService.handleMessage(state.getUserId(), messageText);
+        String gameResponse = gameChangerService.handleMessage(state, messageText);
 
         String birthdayGreeting = null;
-        boolean isRegistering = state.getState() == State.START || registrationScript.supports(state.getState());
-        boolean justRegistered = !wasAlreadyRegistered && state.getBirthDate() != null;
 
-        if ((wasAlreadyRegistered || justRegistered) && !isRegistering) {
-            LocalDateTime now = LocalDateTime.now();
-            boolean isEvenMinute = (now.getMinute() % 2 == 0);
+        if (wasAlreadyRegistered) {
 
-            String greeting = birthdayGreetingService.getGreetingIfBirthday(state, isEvenMinute);
+            boolean isEvenMinute = LocalDateTime.now().getMinute() % 2 == 0;
+            String greeting = birthdayGreetingService.getTgGreeting(state, isEvenMinute);
+
             if (greeting != null && !greeting.isBlank()) {
                 birthdayGreeting = greeting;
             }

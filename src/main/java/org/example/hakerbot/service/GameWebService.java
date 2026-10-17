@@ -1,5 +1,6 @@
 package org.example.hakerbot.service;
 
+import jakarta.transaction.Transactional;
 import org.example.hakerbot.dto.GameHttpResponseDto;
 import org.example.hakerbot.entity.State;
 import org.example.hakerbot.entity.UserState;
@@ -14,20 +15,25 @@ public class GameWebService {
     private final GameChangerService gameChangerService;
     private final BirthdayGreetingService birthdayGreetingService;
 
-    public GameWebService(UserSessionRepository userRepository, GameChangerService gameChangerService, BirthdayGreetingService birthdayGreetingService) {
+    public GameWebService(UserSessionRepository userRepository,
+                          GameChangerService gameChangerService,
+                          BirthdayGreetingService birthdayGreetingService) {
         this.userRepository = userRepository;
         this.gameChangerService = gameChangerService;
         this.birthdayGreetingService = birthdayGreetingService;
     }
 
+    @Transactional
     public GameHttpResponseDto processWebMessage(Long userId, String message) {
         UserState state = userRepository.findById(userId)
                 .orElseGet(() -> userRepository.save(new UserState(userId, State.START)));
 
-        String gameText = gameChangerService.handleMessage(state.getUserId(), message);
+        boolean wasAlreadyRegistered = state.getBirthDate() != null;
 
-        if (state.getBirthDate() != null) {
-            String birthdayGreeting = birthdayGreetingService.getGreetingIfBirthday(state);
+        String gameText = gameChangerService.handleMessage(state, message);
+
+        if (wasAlreadyRegistered) {
+            String birthdayGreeting = birthdayGreetingService.getWebGreeting(state);
 
             if (birthdayGreeting != null && !birthdayGreeting.isBlank()) {
                 gameText = birthdayGreeting + gameText;

@@ -4,6 +4,7 @@ import org.example.hakerbot.entity.State;
 import org.example.hakerbot.entity.UserState;
 
 public interface GameScript {
-    boolean supports(State state);
+
+    State getTargetState();
     String handle(UserState state, String messageText);
 }
